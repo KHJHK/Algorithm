@@ -1,2 +1,2 @@
 # Algorithm
-# Algorithm Study를 위해 만든 폴더입니다.
+# 알고리즘 공부를 위해 만든 공간!
