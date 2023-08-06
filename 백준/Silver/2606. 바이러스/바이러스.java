@@ -1,50 +1,57 @@
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
+import java.io.IOException;
+import java.util.*;
 
 public class Main {
-	static int map[][];		// 각 정점간 탐색 경로 저장
-	static boolean visit[];	// 정점 탐색여부 체크
-	static int n, m, v;		// 정점, 간선, 시작 정점
-	static int count = 0;	// 정점과 연결된 바이러스 걸리는 컴퓨터 수
-	
-	public static int bfs(int i) {
-		Queue<Integer> q = new LinkedList<Integer>();
-		q.offer(i);
-		visit[i] = true;
-		while(!q.isEmpty()) {
-			int temp = q.poll();
-			
-			for(int k=1; k<=n; k++) {
-				if(map[temp][k] == 1 && visit[k] == false) {
-					q.offer(k);
-					visit[k] = true;
-					count ++;
-				}
-			}
-		}
+	/**
+	 * 1. 첫 째 줄에 컴퓨터 대 수 N 입력
+	 * 2. 두번 쨰 줄에 노드 간 연결된 수 K
+	 * 3. 연결 관계 K개 주어짐
+	 */
+	static Map<Integer, ArrayList<Integer>> connect = new HashMap<>();
+	static boolean[] visit;
+	static int cnt = 0;
+
+	public static void main(String[] args) throws IOException {
+		//입력부
+		Scanner sc = new Scanner(System.in);
+		int N = sc.nextInt();
+		int K = sc.nextInt();
+		visit = new boolean[N];
+		visit[0] = true;
+
+		for (int i = 1; i <= N; i++) connect.put(i, new ArrayList<>());
 		
-		return count;
+		//연결 관계 입력
+		// ArrayList<ArrayList>> 혹은 Map<Integer, ArrayList>>꼴로 만들어 정보 저장
+		// 이럴 경우 [1 : 1,2,3 | 2 : 1,3,5 | 3 : 1,2,5 | ... ] 이런식으로 정보 저장 가능
+		ArrayList<Integer> temp;
+		for (int i = 0; i < K; i++) {
+			int cpu1 = sc.nextInt();
+			int cpu2 = sc.nextInt();
+			temp = connect.get(cpu1);
+			temp.add(cpu2);
+			temp = connect.get(cpu2);
+			temp.add(cpu1);
+		}
+
+		System.out.println(dfs(1));
 	}
 
-	public static void main(String[] args) {
-		Scanner scan = new Scanner(System.in);
-		n = scan.nextInt();	// 컴퓨터 수(정점)
-		m = scan.nextInt();	// 연결된 컴퓨터 쌍의 수(간선)
-		v = 1;	// 탐색 시장할 정점의 번호
-		map = new int[n+1][n+1];	// 각 정점간 탐색 경로를 저장할 배열
-		visit = new boolean[n+1];	// 정점의 탐색 여부 체크
-		
-		// 인접행렬을 이용한 풀이
-		for(int i=0; i<m; i++) {
-			int a = scan.nextInt();
-			int b = scan.nextInt();
-			map[a][b] = map[b][a]= 1;
+	//bfs
+	//인근 노드 탐색
+	//감염된 초기 노드 1을 queue에 삽입
+	//만약 인접 노드가 감염되지 않은 노드(visit[i] == false)면 감염시키고 감염된 cpu 번호를 queue에 넣음
+	static int dfs(int cpu) {
+		ArrayList<Integer> cpuList = connect.get(cpu);
+		for (int cpu2 : cpuList) {
+			if(!visit[cpu2 - 1]){
+				visit[cpu2 - 1] = true;
+				dfs(cpu2);
+				cnt++;
+			}
 		}
-		
-		System.out.println(bfs(1));
-		scan.close();
 
+		return cnt;
 	}
 
 }
