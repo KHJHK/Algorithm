@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 public class Main {
+	static StringBuilder sb = new StringBuilder();
 
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		PriorityQueue<Integer> pq = new PriorityQueue<>(new Comparator<Integer>() {
@@ -32,10 +33,12 @@ public class Main {
 			int num = Integer.parseInt(br.readLine());
 			if(num == 0) {
 				if(pq.isEmpty())
-					System.out.println(0);
-				else	System.out.println(pq.poll());
+					sb.append("0").append("\n");
+				else	sb.append(pq.poll()).append("\n");
 			}else	pq.add(num);
 		}
+		
+		System.out.println(sb);
 	}
 	
 }
