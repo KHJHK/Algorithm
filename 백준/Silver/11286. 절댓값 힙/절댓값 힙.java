@@ -31,7 +31,7 @@ public class Main {
 		for (int i = 0; i < N; i++) {
 			int num = Integer.parseInt(br.readLine());
 			if(num == 0) {
-				if(pq.peek() == null)
+				if(pq.isEmpty())
 					System.out.println(0);
 				else	System.out.println(pq.poll());
 			}else	pq.add(num);
