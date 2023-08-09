@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class Main {
-    static StringBuilder sb = new StringBuilder();
+	static StringBuilder sb = new StringBuilder();
     static int N, M, R;
     static int[] dr = {1, 0, -1, 0};
     static int[] dc = {0, 1, 0, -1};
@@ -28,19 +28,19 @@ public class Main {
 
         lotation();
 
-        for (int i = 1; i < map.length - 2; i++){
+        for (int i = 1; i < map.length - 1; i++){
             for (int j = 1; j < map[i].length - 1; j++) sb.append(map[i][j]).append(" ");
             sb.append("\n");
         }
-        for (int j = 1; j < map[0].length - 1; j++) sb.append(map[map.length - 2][j]).append(" ");
         System.out.println(sb);
     }
 
     static void lotation() {
         int row = 1;
         int col = 1;
+        int rTemp = R;
         while(N > 0 && M > 0) {
-//            R %= 2 * (N + M) - 4;    //최소 반복 횟수로 줄여줌
+            R %= 2 * (N + M) - 4;    //최소 반복 횟수로 줄여줌
 
             for (int r = 0; r < R; r++) {
                 int nextNum = map[row][col];
@@ -61,6 +61,7 @@ public class Main {
 
             N -= 2;
             M -= 2;
+            R = rTemp;
             row++;
             col++;
         }
