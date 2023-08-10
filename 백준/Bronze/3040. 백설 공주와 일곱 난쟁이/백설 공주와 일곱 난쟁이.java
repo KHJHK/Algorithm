@@ -1,7 +1,8 @@
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
+	static StringBuilder sb = new StringBuilder();
+	
 	static int[] arr = new int[9];
 	static int[] combArr = new int[7];
 	static boolean isFind = false;
@@ -12,6 +13,7 @@ public class Main {
 		for (int i = 0; i < 9; i++) arr[i] = sc.nextInt();
 		combination(0, 0);
 		
+		System.out.println(sb);
 		sc.close();
 	}
 	
@@ -20,7 +22,7 @@ public class Main {
 			int sum = 0;
 			for (int i : combArr) sum += i;
 			if(sum == 100) {
-				for (int i : combArr)	System.out.println(i);
+				for (int i : combArr)	sb.append(i).append("\n");
 				isFind = true;
 			}
 			return;
