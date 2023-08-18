@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import java.util.Scanner;
 public class Main {
     static int N, ans;
@@ -28,7 +27,6 @@ public class Main {
                 visited[col] = !visited[col];
                 nQuenn(row + 1);
                 visited[col] = !visited[col];
-                column[row] = -1;
             }
 
         }
