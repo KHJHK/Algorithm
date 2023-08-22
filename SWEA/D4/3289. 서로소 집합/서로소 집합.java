@@ -29,13 +29,13 @@ public class Solution {
 			
 			for (int i = 0; i < M; i++) {
 				st = new StringTokenizer(br.readLine());
-				char inputCase = st.nextToken().charAt(0);
+				String inputCase = st.nextToken();
 				int num1 = Integer.parseInt(st.nextToken());
 				int num2 = Integer.parseInt(st.nextToken());
 				
-				if(inputCase == '0')
+				if(inputCase.equals("0"))
 					union(num1, num2);
-				else if(inputCase == '1') {
+				else{
 					if(find(num1) == find(num2)) sb.append(1);
 					else sb.append(0);
 				}
