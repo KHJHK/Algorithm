@@ -1,153 +1,107 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Queue;
 
-/**
- * 
- * 1. 7명의 여학생으로 구성
- * 2. 7명의 자리는 가로나 세로로 반드시 인접해 있어야 한다.
- * 3. 반드시, 이다솜파의 학생들로만 구성될 필요는 없다.
- * 4. 생존을 위해, 이다솜파가 반드시 우위를 점해야 한다. => 7명의 학생 중 	이다솜파 학생이 4명 이상은 포함되어야 함
- * 
- * 목적 : 여학생 반의 자리 배치도가 주어졌을 때, 소문난 칠공주를 결성할 수 있는 모든 경우의 수
- * 
- * 문제 해결 방법
- * 1. 7명을 조합으로 선정한다.
- * 2. 조합된 7명을 bfs를 통해 연결여부를 확인한다.
- * 3. 연결이 되어있고 4명 이상이면 가능
- * 
- * @author SSAFY
- *
- */
-
 public class Main {
+	/**
+	 * Question
+	 * 1. S와 Y가 주어진 5*5 배열 주어짐
+	 * 2. 연결된 7명을 찾기
+	 * 3. 해당 연결에 S가 4개 이상인 연결의 개수 찾기
+	 * 
+	 * Answer
+	 * 1. 총 7명의 여학생 뽑기(Combination)
+	 * 	- 만약 7명 중 S가 3개 이하일 경우 해당 케이스 진행 X
+	 * 2. 7명의 여학생 연결 관계 확인 - 연결관계일 경우 answer + 1
+	 * 3. answer 출력
+	 */
+	static final int TOTAL_STUDENT = 25;
+	static final int N = 5;
+	static final int TOTAL_PICK = 7;
 	
-	static final int[] dr = {-1,0,1,0};
-	static final int[] dc = {0,-1,0,1};
-	
-	static class Node{
-		int r;
-		int c;
-		public Node(int r, int c) {
-			this.r = r;
-			this.c = c;
-		}
-	}
-	
-	static boolean[][] visited;
-	static boolean[][] bfsvisited;
-	static char[][] map;
+	static char students[] = new char[TOTAL_STUDENT];
+	static int[] direction = {-5, 1, 5, -1};
+	static int[] pick = new int[TOTAL_PICK];
+	static boolean[] visited = new boolean[TOTAL_PICK];
 	static int answer;
-	static int[] out;
 	
-	public static void main(String[] args) throws Exception{
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		
-		map = new char[5][5];
-		visited = new boolean[5][5];
-		answer = 0;
-		out = new int[7];
-		
-		for(int i=0;i<5;i++) {
-			char[] line = br.readLine().toCharArray();
-			for(int j=0;j<5;j++) {
-				map[i][j]=line[j];
+		for (int r = 0; r < N; r++) {
+			String input = br.readLine();
+			for (int c = 0; c < N; c++) {
+				students[(N * r) + c] = input.charAt(c);
 			}
 		}
 		
-		dfs(0,0,0);
-//		print();
-		
+		combination(0, 0, 0);
 		System.out.println(answer);
 	}
+
+	private static void combination(int pickIdx, int start, int yCnt) {
+		if(yCnt >= 4) {
+			if(pick[0] == 0) {
+			}
+			return;
+		}
+		
+		if(pickIdx == 7) {
+			//bfs로 연결관계 체크
+			bfs();
+			return;
+		}
+		
+		for (int idx = start; idx < TOTAL_STUDENT; idx++) {
+			pick[pickIdx] = idx;
+			if(students[idx] == 'Y') {
+				combination(pickIdx + 1, idx + 1, yCnt + 1);
+			}else {
+				combination(pickIdx + 1, idx + 1, yCnt);
+			}
+		}
+	}
 	
-	private static int bfs(int[] out) {
-		Queue<Node> q = new LinkedList<>();
-		bfsvisited = new boolean[5][5];
-		bfsvisited[out[0]/5][out[0]%5] = true;
-		q.offer(new Node(out[0]/5, out[0]%5));
+	private static void bfs() {
+		Queue<Integer> queue = new ArrayDeque<Integer>();
+		Arrays.fill(visited, false);
 		
-		int cnt = 1;
+		queue.offer(pick[0]);
+		visited[0] = true;
 		
-		while(!q.isEmpty()) {
-			Node cur = q.poll();
+		while(!queue.isEmpty()) {
+			int studentNum = queue.poll();
 			
-			for(int d=0;d<4;d++) {
-				int nr = cur.r+dr[d];
-				int nc = cur.c+dc[d];
-				
-				if(!isInRnage(nr, nc) || bfsvisited[nr][nc]) continue;
-				for(int i=0;i<out.length;i++) {
-					if(nr*5+nc==out[i]) {
-						bfsvisited[nr][nc]=true;
-						q.offer(new Node(nr, nc));
-						cnt++;
+			for (int d = 0; d < 4; d++) {
+				int nextStudentNum = studentNum + direction[d];
+				if(checkBoundary(nextStudentNum)) {
+					for (int i = 0; i < TOTAL_PICK; i++) {
+						if(nextStudentNum == pick[i] && !visited[i]) {
+							if((direction[d] == 1 && nextStudentNum % 5 == 0) || (direction[d] == -1 && nextStudentNum % 5 == 4)) {
+								continue;
+							}
+							queue.offer(nextStudentNum);
+							visited[i] = true;
+							break;
+						}
 					}
 				}
 			}
 		}
 		
-		if(cnt==7) {
-			return 1;
-		}
-		return 0;
-		
-	}
-	
-	private static void dfs(int n, int cnt, int sCnt) {	// n : idx, cnt : 뽑은 학생 수, sCnt : 다솜파 학생 수
-		
-		//남아있는 뽑을 횟수랑 뽑아야할 최소의 다솜파 학생 수를 비교해서 안되면 return
-		if(7-cnt < 4-sCnt) return;
-		
-		
-		//기저 조건
-		if(cnt==7) {
-			int k=0;
-			for(int i=0;i<25;i++) {
-				if(visited[i/5][i%5]) {
-					out[k++]=i;
-				}
+		for (int i = 0; i < TOTAL_PICK; i++) {
+			if(!visited[i]) {
+				return;
 			}
-//			System.out.println(Arrays.toString(out));
-			answer += bfs(out);
-			return;
 		}
-		
-		if(n==25) return;
-		
-		//뽑았을 때
-		visited[n/5][n%5]=true;
-		dfs(n+1, cnt+1, sCnt+isDaSom(n));
-		
-		
-		//뽑지 않았을 때
-		visited[n/5][n%5]=false;
-		dfs(n+1, cnt, sCnt);
-		
+		answer++;
 	}
-	
-	private static int isDaSom(int n) {
-		if(map[n/5][n%5]=='S') return 1;
-		return 0;
+
+	private static boolean checkBoundary(int nextIdx) {
+		return 0 <= nextIdx && TOTAL_STUDENT > nextIdx;
 	}
-	
-//	private static int isNotDaSom(int n) {
-//		if(map[n/5][n%5]=='Y') return 1;
-//		return 0;
-//	}
-	
-	private static boolean isInRnage(int x, int y) {
-		return x>=0 && y>=0 && x<5 && y<5;
-	}
-	
-	private static void print() {
-		for(int i=0;i<5;i++) {
-			for(int j=0;j<5;j++) {
-				System.out.print(map[i][j]+" ");
-			}
-			System.out.println();
-		}
-	}
+
 }
