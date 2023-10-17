@@ -27,6 +27,7 @@ public class Main {
 	}
 
 	private static long binarySearch(long start, long end) {
+		long answer = 0;
 		long mid = (end + start) / 2;
 		int cnt = 0;
 		
@@ -41,20 +42,12 @@ public class Main {
 			if(cnt < N) {
 				end = mid - 1;
 			}else if(cnt >= N) {
-				cnt = 0;
-				for (int num : nums) {
-					cnt += num / (mid + 1);
-				}
-				
-				if(cnt >= N) {
-					start = mid + 1;
-				}else {
-					break;
-				}
+				answer = Math.max(answer, mid);
+				start = mid + 1;
 			}
 		}
 		
-		return mid;
+		return answer;
 	}
 
 }
