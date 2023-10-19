@@ -31,6 +31,7 @@ public class Main {
 	static PriorityQueue<Member> pq;
 	
 	public static void main(String[] args) throws NumberFormatException, IOException {
+		StringBuilder sb = new StringBuilder();
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		pq = new PriorityQueue<>();
 		int N = Integer.parseInt(br.readLine());
@@ -43,8 +44,10 @@ public class Main {
 		}
 		
 		while(!pq.isEmpty()) {
-			System.out.println(pq.poll());
+			sb.append(pq.poll().toString()).append("\n");
 		}
+		
+		System.out.print(sb);
 	}
 
 }
