@@ -1,7 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.math.BigInteger;
 
 public class Main {
 
@@ -9,12 +9,16 @@ public class Main {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		int L = Integer.parseInt(br.readLine());
 		char[] input = br.readLine().toCharArray();
-		int result = 0;
+		BigInteger answer = new BigInteger("0");
+		BigInteger r = new BigInteger("31");
+		BigInteger m = new BigInteger("1234567891");
 		
 		for (int i = 0; i < L; i++) {
-			result += (input[i] - 96) * (Math.pow(31, i));
+			int num = (input[i] - 96);
+			BigInteger result = r.pow(i).multiply(new BigInteger(num + ""));
+			answer = answer.add(result).mod(m);
 		}
-		System.out.print(result);
+		System.out.print(answer);
 	}
 
 }
