@@ -24,13 +24,14 @@ public class Main {
 	static Map<Integer, Integer> orderMap = new TreeMap<>();
 
 	public static void main(String[] args) throws IOException{
-        Scanner sc = new Scanner(System.in);
-        N = sc.nextInt();
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		N = Integer.parseInt(br.readLine());
         nums = new int[N];
         dp = new int[N];
         order = new int[N];
         
-        for(int i = 0; i < N; i++) nums[i] = sc.nextInt();
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        for(int i = 0; i < N; i++) nums[i] = Integer.parseInt(st.nextToken());
         int len = LIS();
         int[] lisArr = new int[len];
         int now = len -1;
@@ -41,8 +42,6 @@ public class Main {
         
         System.out.println(len);
         for(int n : lisArr) System.out.print(n + " ");
-        
-        sc.close();
 	}
 	
 	public static int LIS() {
