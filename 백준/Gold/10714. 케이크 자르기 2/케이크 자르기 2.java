@@ -2,87 +2,56 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	/**
-	 * - 문제
-	 * 1. a가 케이크 고름
-	 * 2. b는 현재 선택된 케이크과 인접한 케이크 중 가장 큰 케이크 고름
-	 * 3. 1, 2 반복
-	 * 4. a가 가질 수 있는 케이크 최대값 구하기
-	 * 
-	 * - 풀이
-	 * 모든 케이크 경우의 수 => N * (N/2 - 1)
-	 * N 최대 2000이라 시간 초과 안남
-	 * 숫자가 크니 자료형 long 사용
-	 */
-
+    
 	static int N;
-	static boolean[] visited;
+	static long[][] dp;
 	static long answer;
 	static long[] cakes;
+	static boolean[] visited;
 	
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		N = Integer.parseInt(br.readLine());
 		cakes = new long[N];
-		visited = new boolean[N];
+		dp = new long[N][N];
+		
+		
 		for(int i = 0; i < N; i++) cakes[i] = Long.parseLong(br.readLine());
 		
 		for(int i = 0; i < N; i++) {
-			int before = pickIdx(i, true);
-			int after = pickIdx(i, false);
-			visited[i] = true;
-			findMax(cakes[i], 1, before, after);
-			visited[i] = false;
+			dp[left(i)][right(i)] = cakes[i];
+			answer = Math.max(answer, cakes[i] + yourTurn(left(i), right(i), 2));
 		}
 		
 		System.out.println(answer);
 	}
 	
-	static void findMax(long sum, int cnt, int beforeIdx, int afterIdx) {
-		if(cnt >= N - 1) {
-			answer = Math.max(sum, answer);
-			return;
-		}
+	static long myTurn(int left, int right, int turn) {
+		if(turn == N) return cakes[left]; //마지막 케이크 선택
 		
-		int newIdx;
-		if(cakes[beforeIdx] > cakes[afterIdx]) {
-			newIdx = pickIdx(beforeIdx, true);
-			visited[beforeIdx] = true;
-			
-			if(!visited[newIdx]) {
-				visited[newIdx] = true;
-				findMax(sum + cakes[newIdx], cnt + 2, pickIdx(newIdx, true), afterIdx);
-				visited[newIdx] = false;
-			}
-			
-			if(newIdx != afterIdx && !visited[afterIdx]) {
-				visited[afterIdx] = true;
-				findMax(sum + cakes[afterIdx], cnt + 2, newIdx, pickIdx(afterIdx, false));
-				visited[afterIdx] = false;
-			}
-			visited[beforeIdx] = false;
-		}else {
-			newIdx = pickIdx(afterIdx, false);
-			visited[afterIdx] = true;
-			
-			if(!visited[newIdx]) {
-				visited[newIdx] = true;
-				findMax(sum + cakes[newIdx], cnt + 2, beforeIdx, pickIdx(newIdx, false));
-				visited[newIdx] = false;
-			}
-			
-			if(newIdx != beforeIdx && !visited[beforeIdx]) {
-				visited[beforeIdx] = true;
-				findMax(sum + cakes[beforeIdx], cnt + 2, pickIdx(beforeIdx, true), newIdx);
-				visited[beforeIdx] = false;
-			}
-			visited[afterIdx] = false;
-		}
+		if(dp[left][right] != 0) return dp[left][right];
+		
+		//왼쪽, 오른쪽 케이크 선택한 경우 중 큰 경우를 dp값으로 저장
+		long leftCase = cakes[left] + yourTurn(left(left), right, turn + 1);
+		long rightCase = cakes[right] + yourTurn(left, right(right), turn + 1);
+		
+		return dp[left][right] = Math.max(leftCase, rightCase);
 	}
 	
-	static int pickIdx(int idx, boolean isBefore) {
-		if(isBefore) return idx == 0 ? N - 1 : idx - 1;
-		else return idx == N - 1 ? 0 : idx + 1;
+	static long yourTurn(int left, int right, int turn) {
+		if(turn >= N) return 0; //상대방 턴에 케이크 선택이 종료되면, 내 점수에 더해주지 않음
+		
+		//좌, 우 중에서 큰 케이크 선택
+		if(cakes[left] > cakes[right]) return myTurn(left(left), right, turn + 1);
+		return myTurn(left, right(right), turn + 1);
+	}
+	
+	static int right(int idx) {
+		return (idx + 1) % N;
+	}
+	
+	static int left(int idx) {
+		return (N + idx - 1) % N;
 	}
 
 }
