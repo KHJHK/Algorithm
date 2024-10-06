@@ -6,7 +6,6 @@ class Solution {
     public int[] dr = {-1, 1, 0, 0};
     public int[] dc = {0, 0, -1, 1};
     public int[][] map;
-    public boolean isRedEnd, isBlueEnd;
     public boolean[][][] visited; // 0 = red | 1 = blue
     
     public int solution(int[][] maze){
@@ -34,14 +33,13 @@ class Solution {
         visited[red[0]][red[1]][0] = true;
         visited[blue[0]][blue[1]][1] = true;
         
-        
-        int answer = dfs(red[0], red[1], blue[0], blue[1], 0);
+        int answer = dfs(red[0], red[1], blue[0], blue[1], false, false, 0);
         
         if(answer == Integer.MAX_VALUE) return 0;
         return answer;
     }
     
-    public int dfs(int rr, int rc, int br, int bc, int depth){
+    public int dfs(int rr, int rc, int br, int bc, boolean isRedEnd, boolean isBlueEnd, int depth){
         if(isRedEnd && isBlueEnd) return depth;
         
         int move = Integer.MAX_VALUE;
@@ -78,19 +76,17 @@ class Solution {
                 visited[nbr][nbc][1] = true;
                 
                 //도착 확인
-                if(map[nrr][nrc] == 3) isRedEnd = true;
-                if(map[nbr][nbc] == 4) isBlueEnd = true;
+                boolean isNextRedEnd = false;
+                boolean isNextBlueEnd = false;
+                if(map[nrr][nrc] == 3) isNextRedEnd = true;
+                if(map[nbr][nbc] == 4) isNextBlueEnd = true;
                 
                 //현재 상황에서 다시 한번 dfs(백트래킹)
-                move = Math.min(move, dfs(nrr, nrc, nbr, nbc, depth + 1));
+                move = Math.min(move, dfs(nrr, nrc, nbr, nbc, isNextRedEnd, isNextBlueEnd, depth + 1));
                 
                 //방문 처리 초기화
                 visited[nrr][nrc][0] = false;
                 visited[nbr][nbc][1] = false;
-                
-                //도착 확인 초기화
-                isRedEnd = false;
-                isBlueEnd = false;
             }
         }
         
