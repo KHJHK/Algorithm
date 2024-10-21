@@ -53,9 +53,7 @@ public class Main {
 	public static void floydWarshall() {
 		for(int mid = 0; mid < N; mid++) {
 			for(int start = 0; start < N; start++) {
-				if(start == mid) continue;
 				for(int end = 0; end < N; end++) {
-					if(start == end || end == mid) continue;
 					int temp = link[start][end];
 					link[start][end] = Math.min(link[start][end], link[start][mid] + link[mid][end]);
 					if(temp != link[start][end]) {
