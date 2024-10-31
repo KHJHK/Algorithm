@@ -10,6 +10,7 @@ problems[3] = 코딩력 상승치
 problems[4] = 소요시간
 모든 문제를 풀 수 있는 최단 시간 구하기
 
+0. 알고력 1 상승, 코딩력 1 상승 하는 각 경우를 요구치 0, 비용 1 문제로 넣어줌
 1. 모든 문제를 풀기 위한 alp와 cop를 저장하는 변수 maxAlp, maxAlp 생성
 2. dp[알고력][코딩력] 만들기
 3. 초기 alp, cop에서 시작하여, 특정 문제를 풀 때마다 쌓이는 시간을 dp에 저장
@@ -64,7 +65,7 @@ class Solution {
             int temp = dp[nextAlp][nextCop];
             dp[nextAlp][nextCop] = Math.min(dp[nextAlp][nextCop], dp[alp][cop] + p[4]);
             
-            if(temp > dp[nextAlp][nextCop]) solve(nextAlp, nextCop);
+            if(temp > dp[nextAlp][nextCop]) solve(nextAlp, nextCop); //값이 작아질때만 solve 추가 진행.
         }
     }
 }
