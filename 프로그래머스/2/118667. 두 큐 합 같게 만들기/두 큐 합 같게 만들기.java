@@ -23,8 +23,8 @@ class Solution {
         
         long target = sum / 2;
         int cnt = 0;
-        //평균적으로 2*(두 큐의 길이 합) + 2 회 정도면 답이 나오는듯 => 넉넉잡아 2(2*(두 큐의 길이 합) + 2) 회 진행하여 답 안나오면 오답처리
-        int maximum = 2 * (2 * (q1.size() + q2.size()) + 2);
+        //보통 2*(두 큐의 길이 합) + 2 회 이내에 답이 나오는듯 => 넉넉잡아 2(2*(두 큐의 길이 합) + 2) 회 진행하여 답 안나오면 오답처리
+        int maximum = 2 * (q1.size() + q2.size()) + 2;
         while(cnt <= maximum){
             if(q1Sum == target){
                 answer = cnt;
