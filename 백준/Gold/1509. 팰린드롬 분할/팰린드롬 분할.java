@@ -14,18 +14,9 @@ public class Main {
 		repeat = new boolean[len][len];
 		dp = new int[len];
 		
-		repeat[0][0] = true;
-		for(int i = 1; i < len; i++) {
+		for(int i = 0; i < len; i++) {
 			repeat[i][i] = true;
-			if(charArr[i-1] == charArr[i]) repeat[i-1][i] = true; //길이가 2인 경우는 특이케이스로 판단, 회문 따로 검사
-		}
-		
-		//회문 검사
-		for(int i = 0; i < len - 2; i++) {
-			for(int j = i; j < len; j++) {
-				if(j - i <= 1) continue; //길이가 3인 경우부터 회문 검사
-				checkRepeat(i, j); //회문 검사
-			}
+			for(int j = 0; j < i; j++) checkRepeat(j, i);
 		}
 		
 		Arrays.fill(dp, Integer.MAX_VALUE);
@@ -33,11 +24,10 @@ public class Main {
 		findRepeatGroup(); //회문 최소 개수 찾기
 		System.out.println(dp[len - 1]);
 	}
-	
-	public static boolean checkRepeat(int start, int end) {
-		if(repeat[start][end] || start == end) return repeat[start][end];
-		if(charArr[start] == charArr[end] && checkRepeat(start + 1, end - 1)) repeat[start][end] = true;
-		return repeat[start][end];
+		
+	public static void checkRepeat(int start, int end) {
+		if(charArr[start] == charArr[end] && repeat[start + 1][end - 1]) repeat[start][end] = true;
+		if(charArr[start] == charArr[end] && repeat[start + 1][end]) repeat[start][end] = true;
 	}
 	
 	public static void findRepeatGroup() {
