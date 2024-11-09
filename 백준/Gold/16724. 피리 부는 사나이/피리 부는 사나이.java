@@ -7,15 +7,16 @@ public class Main {
 	static int[][][] dp;
 	static char[][] map;
 	static boolean[][] visited;
-	static Map<Character, int[]> direction = Map.of(
-				'U', new int[] {-1, 0},
-				'D', new int[] {1, 0},
-				'L', new int[] {0, -1},
-				'R', new int[] {0, 1}
-			
-			);
+	static Map<Character, int[]> direction = new HashMap<>();
+	static {
+		direction.put('U', new int[] {-1, 0});
+		direction.put('D', new int[] {1, 0});
+		direction.put('L', new int[] {0, -1});
+		direction.put('R', new int[] {0, 1});
+	}
 
 	public static void main(String[] args) throws IOException{
+			
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 			StringTokenizer st = new StringTokenizer(br.readLine());
 			N = Integer.parseInt(st.nextToken());
