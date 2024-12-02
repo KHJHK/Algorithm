@@ -1,6 +1,20 @@
 import java.io.*;
 import java.util.*;
 
+/**
+ * 
+ * 1. 각 기구 몇 번째에 샤용되는지 확인(deviceOrder -> queue 배열)
+ * 2. 콘센트 꽂기
+ * 2.0 현재 i번째 기기인 a를 꽂는다고 가정
+ * 	2.1 비어있는 칸이 있으면, 현재 기기 a 꽂기
+ * 	2.2 만약 콘센트가 꽉 찼다면, 등장 순번이 더 느린 기기 우선 뽑기
+ * 		- 콘센트에 꽂힌 기기 중 deviceOrder[a].peek이 더 큰 값 고르기
+ * 	2.3 기기를 꽂는다면, 현재 기기 a가 다시 나오는 횟수 차감
+ * 		- deviceOrder[a].poll();
+ * 		- 플러그 빼는 횟수 +1
+ *
+ */
+
 public class Main {
 	static int N, K, cnt;
 	static int[] extentionCode; //멀티탭에서 사용중인 기기 저장
@@ -62,7 +76,7 @@ public class Main {
 				}
 			}
 			
-			//2.3 멀티탭에서 이후 사용 빈도가 가장 낮은 기기 빼기
+			//2.3 멀티탭에서 이후 사용 순번이 가장 늦은 기기 빼기
 			int removeDevice = extentionCode[removeIdx];
 			if(removeDevice != device) cnt++; //현재 꽂는 기기가 멀티탭에 없는 경우만 기기를 멀티탭에서 빼는 횟수 증가
 			extentionCode[removeIdx] = device;
