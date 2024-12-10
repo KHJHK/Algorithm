@@ -2,7 +2,6 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	//문제번호, 난이도만 있는 문제
 	static class Algorithm implements Comparable<Algorithm>{
 		int id;
 		int level;
@@ -20,9 +19,10 @@ public class Main {
 	
 	static int N, M;
 	static TreeSet<Algorithm> algorithms = new TreeSet<>();
-	static HashMap<Integer, TreeSet<Algorithm>> algorithmsMap = new HashMap<>(); //유형별로 algorithm TreeSet을 나누어 저장
-	static HashMap<Integer, int[]> delMap = new HashMap<>(); //문제 번호 key, 문제 난이도 및 분류를 value, 삭제용 객체 생성에 사용 
+	static HashMap<Integer, TreeSet<Algorithm>> algorithmsMap = new HashMap<>();
+	static HashMap<Integer, int[]> delMap = new HashMap<>(); 
 	static StringBuilder sb = new StringBuilder();
+	static Algorithm algo;
 	
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -34,12 +34,10 @@ public class Main {
 			int level = Integer.parseInt(st.nextToken());
 			int category = Integer.parseInt(st.nextToken());
 			
-			//유형 고려 X
-			algorithms.add(new Algorithm(id, level));
-			//유형 고려 O
+			algo = new Algorithm(id, level);
+			algorithms.add(algo);
 			if(!algorithmsMap.containsKey(category)) algorithmsMap.put(category, new TreeSet<Algorithm>());
-			algorithmsMap.get(category).add(new Algorithm(id, level));
-			//삭제용 객체 생성을 위한 정보
+			algorithmsMap.get(category).add(algo);
 			delMap.put(id, new int[] {level, category});
 			
 		}
@@ -89,25 +87,25 @@ public class Main {
 	}
 	
 	static int recommend3(int x, int level) {
-		Algorithm result;
-		if(x == 1) result = algorithms.ceiling(new Algorithm(-1, level));
-		else result = algorithms.lower(new Algorithm(-1, level));
-		if(result == null) return -1;
-		return result.id;
+		if(x == 1) algo = algorithms.ceiling(new Algorithm(-1, level));
+		else algo = algorithms.lower(new Algorithm(-1, level));
+		if(algo == null) return -1;
+		return algo.id;
 	}
 	
 	static void add(int id, int level, int category) {
-		algorithms.add(new Algorithm(id, level));
+		algo = new Algorithm(id, level);
+		algorithms.add(algo);
 		if(!algorithmsMap.containsKey(category)) algorithmsMap.put(category, new TreeSet<Algorithm>());
-		algorithmsMap.get(category).add(new Algorithm(id, level));
+		algorithmsMap.get(category).add(algo);
 		delMap.put(id, new int[] {level, category});
 	}
 	
 	static void solved(int id) {
 		int[] delInfo = delMap.get(id);
-		Algorithm delAlgo = new Algorithm(id, delInfo[0]);
-		algorithms.remove(delAlgo); //분류 미포함 TreeSet에서 삭제
-		algorithmsMap.get(delInfo[1]).remove(delAlgo); //분류가 Key인 TreeMap에서 삭제할 문제 유형의 TreeSet을 찾은 해당 TreeSet에서 문제 삭제
+		algo = new Algorithm(id, delInfo[0]);
+		algorithms.remove(algo); 
+		algorithmsMap.get(delInfo[1]).remove(algo);
 	}
 
 }
