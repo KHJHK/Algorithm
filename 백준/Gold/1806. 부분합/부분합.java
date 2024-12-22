@@ -1,44 +1,48 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.io.*;
 
-/**
- * 1. 앞에서 부터 더하기
- * 2. 누적합이 기준 숫자(S) 넘어가면 길이 측정 - 투포인터, 앞 포인터 ~ 뒷 포인터 길이
- * 3. 누적 합이 S 이하가 될때까지 앞에서부터 빼주기
- */
 public class Main {
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
+	static int INF = 1_000_000_000;
+	static int N, S;
+	static int minLen = INF;
+	static int fidx, bidx;
+	static int[] nums;
 
-        int N = Integer.parseInt(st.nextToken());
-        int S = Integer.parseInt(st.nextToken());
-        int[] nums = new int[N];
+	public static void main(String[] args) throws IOException{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		N = Integer.parseInt(st.nextToken());
+		S = Integer.parseInt(st.nextToken());
+		nums = new int[N+1];
+		st = new StringTokenizer(br.readLine());
+		for(int i = 1; i <= N; i++) nums[i] = Integer.parseInt(st.nextToken());
+		
+		int sum = 0;
+		while(bidx <= N) {
+			//1. 다음 칸 확장
+			bidx++;
+			if(bidx > N) break;
+			
+			//2. 다음 칸 가능 여부 확인
+			sum += nums[bidx];
+			if(sum < S) continue;
+			
+			//3. 이전 칸 줄여가며 확인
+			while(fidx != bidx) {
+				sum -= nums[fidx];
+				if(sum < S) {
+					sum += nums[fidx];
+					break;
+				}
+				
+				fidx++;
+			}
+			
+			minLen = Math.min(minLen, bidx - fidx + 1);
+		}
+		
+		if(minLen == INF) minLen = 0;
+		System.out.println(minLen);
+	}
 
-        st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < N; i++) nums[i] = Integer.parseInt(st.nextToken());
-        int front = 0;
-        int back = 0;
-        int sum = 0;
-        int len = 0;
-        int answer = Integer.MAX_VALUE;
-
-
-        while(back < N){
-            len++;
-            sum += nums[back++];
-            if(sum >= S){
-                while(sum >= S){
-                    answer = Math.min(answer, len);
-                    sum -= nums[front++];
-                    len--;
-                }
-            }
-        }
-
-        if(answer == Integer.MAX_VALUE) answer = 0;
-        System.out.println(answer);
-    }
 }
