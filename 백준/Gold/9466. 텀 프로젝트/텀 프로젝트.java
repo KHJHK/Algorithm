@@ -37,7 +37,10 @@ public class Main {
 		if(visited[next]) {
 			int cnt = -1;
 			for(int i = 1; i <= idx; i++) {
-				if(check[i] == next) cnt = i -1;
+				if(check[i] == next){
+                    cnt = i - 1;
+                    break;
+                }
 			}
 			if(cnt != -1) return cnt;
 			if(cnt == -1) return idx;
