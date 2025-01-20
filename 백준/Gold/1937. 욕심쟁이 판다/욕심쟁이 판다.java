@@ -15,7 +15,6 @@ public class Main {
 	static int[] dc = {0, 1, 0, -1};
 	static int[][] board;
 	static int[][] dp;
-	static PriorityQueue<int[]> pq = new PriorityQueue<>((o1, o2) -> board[o1[0]][o1[1]] - board[o2[0]][o2[1]]);
 	
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -25,18 +24,13 @@ public class Main {
 		
 		for(int i = 0; i < N; i++) {
 			StringTokenizer st = new StringTokenizer(br.readLine());
-			for(int j = 0; j < N; j++) {
-				board[i][j] = Integer.parseInt(st.nextToken());
-				pq.offer(new int[] {i, j});
-			}
+			for(int j = 0; j < N; j++) board[i][j] = Integer.parseInt(st.nextToken());
 		}
 		
-		while(!pq.isEmpty()) {
-			int[] now = pq.poll();
-			int r = now[0];
-			int c = now[1];
-			
-			if(dp[r][c] == 0) answer = Math.max(answer, dp(r, c));
+		for(int r = 0; r < N; r++) {
+			for(int c = 0; c < N; c++) {
+				if(dp[r][c] == 0) answer = Math.max(answer, dp(r, c));
+			}
 		}
 		
 		System.out.println(answer);
