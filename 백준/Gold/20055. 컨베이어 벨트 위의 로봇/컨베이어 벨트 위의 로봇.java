@@ -1,101 +1,102 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.io.*;
+/**
+ * 
+ * - 로봇이 올라가거나, 이동하면(벨트 회전X) 칸 내구도 1 하락
+ * 1. 벨트 회전 및 내리기
+ * 2. 로봇 이동 및 내리기
+ * 3. 로봇 올리기
+ * 4. 내구도 0인 칸 확인
+ */
 
 public class Main {
-    static class Belt{
-        int beltNum;
-        int durability;
-        boolean isRobotOn;
+	static class Belt{
+		int hp;
+		boolean robot;
+		
+		Belt(int hp, boolean robot) {
+			this.hp = hp;
+			this.robot = robot;
+		}
+	}
 
-        Belt(int beltNum, int durability){
-            this.beltNum = beltNum;
-            this.durability = durability;
-            this.isRobotOn = false;
-        }
+	static int N, K;
+	static ArrayDeque<Belt> conveyor1 = new ArrayDeque<>();
+	static ArrayDeque<Belt> conveyor2 = new ArrayDeque<>();
+	
+	public static void main(String[] args) throws IOException{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		N = Integer.parseInt(st.nextToken());
+		K = Integer.parseInt(st.nextToken());
+		
+		st = new StringTokenizer(br.readLine());
+		for(int i = 0; i < N; i++) {
+			int hp = Integer.parseInt(st.nextToken());
+			conveyor1.add(new Belt(hp, false));
+		}
+		
+		
+		for(int i = N; i < 2*N; i++) {
+			int hp = Integer.parseInt(st.nextToken());
+			conveyor2.add(new Belt(hp, false));
+		}
+		
+		int k = 0;
+		int cnt = 0;
+		while(k < K) {
+			cnt++;
+			moveBelt();
+			unloadRobot();
+			k += moveRobot();
+			unloadRobot();
+			k += loadRobot();
+		}
+		
+		System.out.println(cnt);
+	}
+	
+	public static int moveRobot() {
+		int cnt = 0;
+		Iterator<Belt> iter = conveyor1.descendingIterator();
+		Belt next = iter.next();
+		while(iter.hasNext()) {
+			Belt belt = iter.next();
+			//1. 현재칸에 로봇이 있어야함
+			//2. 다음칸에 로봇이 없어야함
+			//3. 다음칸 내구도가 0보다 커야함
+			if(belt.robot && !next.robot && next.hp > 0) {
+				belt.robot = false;
+				next.robot = true;
+				next.hp--;
+				
+				if(next.hp == 0) cnt++;
+			}
+			
+			next = belt;
+		}
+		
+		return cnt;
+	}
+	
+	public static void moveBelt() {
+		conveyor1.offerFirst(conveyor2.pollLast());
+		conveyor2.offerFirst(conveyor1.pollLast());
+	}
+	
+	public static int loadRobot() {
+		int minusHp = 0;
+		Belt belt = conveyor1.peekFirst();
+		if(!belt.robot && belt.hp > 0) {
+			belt.robot = true;
+			belt.hp--;
+			if(belt.hp == 0) minusHp = 1;
+		}
+		
+		return minusHp;
+	}
 
-    }
-
-    static int N, K;
-    static Belt[] map; //0과 N - 1번에서 승/하차
-    static boolean[] checkRobots;
-
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-
-        N = Integer.parseInt(st.nextToken());
-        K = Integer.parseInt(st.nextToken());
-        map = new Belt[2 * N];
-        checkRobots = new boolean[N];
-
-        st = new StringTokenizer(br.readLine());
-
-        for (int i = 0; i < 2 * N; i++) map[i] = new Belt(i, Integer.parseInt(st.nextToken()));
-
-        int answer = 0;
-        while(K > checkDurability()){
-            answer++;
-            moveMap();
-            moveRobot();
-            onLoad();
-        }
-
-        System.out.println(answer);
-    }
-
-
-    public static void moveMap(){
-        Belt temp = map[(2 * N) - 1];
-        for (int i = (2 * N) - 1; i > 0; i--) map[i] = map[i - 1];
-        map[0] = temp;
-
-        for (int i = N - 1; i > 0; i--) checkRobots[i] = checkRobots[i - 1];
-        offLoad();
-        checkRobots[0] = false;
-    }
-
-    public static void moveRobot(){
-        for (int idx = checkRobots.length - 1; idx >= 0; idx--) {
-            if(!checkRobots[idx]) continue;
-
-            int nextIdx = idx + 1;
-            if(nextIdx == 2 * N) nextIdx = 0;
-
-            if(map[nextIdx].durability > 0 && !map[nextIdx].isRobotOn){
-                map[idx].isRobotOn = false;
-                map[nextIdx].isRobotOn = true;
-                map[nextIdx].durability -= 1;
-                checkRobots[idx] = false;
-                checkRobots[nextIdx] = true;
-            }
-        }
-        offLoad();
-    }
-
-    public static void onLoad(){
-        if(map[0].durability > 0){
-            checkRobots[0] = true;
-            map[0].durability -= 1;
-            map[0].isRobotOn = true;
-        }
-    }
-
-    public static void offLoad(){
-        if(map[N - 1].isRobotOn){
-            map[N - 1].isRobotOn = false;
-            checkRobots[N - 1] = false;
-        }
-    }
-
-    public static int checkDurability(){
-        int cnt = 0;
-        for (Belt belt : map) {
-            if(belt.durability == 0) cnt++;
-        }
-
-        return cnt;
-    }
+	public static void unloadRobot() {
+		conveyor1.peekLast().robot = false;
+	}
 }
