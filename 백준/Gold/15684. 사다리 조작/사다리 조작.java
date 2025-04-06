@@ -4,6 +4,7 @@ import java.io.*;
 public class Main {
 	static int N, M, H; //가로 N개 세로 M개 최대 H개 놓기
 	static int answer = 4;
+    static boolean isAnswer;
 	static boolean[][] ladders;
 	
 	public static void main(String[] args) throws IOException{
@@ -21,19 +22,22 @@ public class Main {
 			ladders[a-1][b-1] = true;
 		}
 		
-		put(0, 0, 0);
-		if(answer == 4) answer = -1;
+        for(int i = 0; i < 4; i++){
+            if(isAnswer) break;
+            answer = i;
+            put(0, 0, 0);
+        }
+		
+		if(!isAnswer) answer = -1;
 		System.out.println(answer);
 	}
 	
 	static void put(int h, int c, int cnt) {
 		//놓은 다리의 수 cnt >= answer인 경우, 현재 케이스 종료
-		if(cnt >= answer) return;
+		if(cnt > answer) return;
 		//모든 위치에 다리를 놓은 경우, 사다리 타기 시작
 		if(h == H) {
-			if(startGame()) {
-				answer = cnt;
-			}
+			if(startGame()) isAnswer = true;
 			return;
 		}
 		//ladders 가로 범위를 넘어가는 경우, 한칸 내려가기
