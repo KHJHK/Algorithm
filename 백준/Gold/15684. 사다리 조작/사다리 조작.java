@@ -34,12 +34,15 @@ public class Main {
 	
 	static void put(int h, int c, int cnt) {
 		//놓은 다리의 수 cnt >= answer인 경우, 현재 케이스 종료
-		if(cnt > answer) return;
+		if(isAnswer) return;
 		//모든 위치에 다리를 놓은 경우, 사다리 타기 시작
-		if(h == H) {
+		if(cnt == answer) {
 			if(startGame()) isAnswer = true;
 			return;
 		}
+        
+        if(h == H) return;
+        
 		//ladders 가로 범위를 넘어가는 경우, 한칸 내려가기
 		if(c >= N - 1) {
 			put(h + 1, 0, cnt);
