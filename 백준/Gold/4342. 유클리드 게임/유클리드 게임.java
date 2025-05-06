@@ -1,55 +1,43 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.io.*;
 
 public class Main {
-	public static void main(String[] args) throws IOException {
+
+	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-		StringTokenizer st;
-
 		StringBuilder sb = new StringBuilder();
-		while (true) {
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		long a = Integer.parseInt(st.nextToken());
+		long b = Integer.parseInt(st.nextToken());
+		long big = Math.max(a,  b);
+		long small = Math.min(a,  b);
+		
+		while(a != 0 && b != 0) {
+			if(game(big, small)) sb.append("A wins\n");
+			else sb.append("B wins\n");
 			st = new StringTokenizer(br.readLine());
-			int N = Integer.parseInt(st.nextToken());
-			int M = Integer.parseInt(st.nextToken());
-
-			if (N == 0 && M == 0) {
-				break;
-			}
-
-			sb.append(GCD(N, M) ? "A wins\n" : "B wins\n");
+			a = Integer.parseInt(st.nextToken());
+			b = Integer.parseInt(st.nextToken());
+			big = Math.max(a,  b);
+			small = Math.min(a,  b);
 		}
-
-		bw.write(sb.toString());
-		bw.flush();
-		bw.close();
-		br.close();
+		
+		System.out.println(sb);
 	}
-
-	public static boolean GCD(int v1, int v2) {
-		// v1 < v2가 되도록 조정.
-		if (v1 > v2) {
-			int temp = v1;
-			v1 = v2;
-			v2 = temp;
+	
+	//big >= 2 * small 인 경우, 해당 차례의 플레이어가 다음 차레를 진행할지 말지 결정 가능
+	public static boolean game(long big, long small) {
+		if(big % small == 0) return true; // 바로 승리 가능
+		if(big < 2 * small) { //결정 불가 경우
+			big -= small;
+			if(big < small) {
+				long temp = big;
+				big = small;
+				small = temp;
+			}
+			return !game(big, small);
 		}
-		
-		// 선공이 바로 v2를 0으로 만들어서 이길 수 있음.
-		if (v2 % v1 == 0) {
-			return true;
-		}
-		
-		// 이 조건을 만족하면, 항상 큰 수를 작은 수로 계속 빼야 함.
-		if (v2 - v1 < v1) {
-			return !GCD(v2 - v1, v1);
-		}
-		
-		// 나머지 조건은 모두 선공이 이김.
-		return true;
+		else	return true; //big >= 2 * small
 	}
 
 }
