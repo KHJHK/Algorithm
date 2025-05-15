@@ -9,22 +9,24 @@ import java.util.*;
 - 두 번째 좌표 x <= x < 세 번째 좌표 x
 - 두 번째(or 세 번째) 좌표의 y좌표 <= y
 - 위 범위 안의 모든 칸은 벽
-3. 벽으로 구분된 구역의 최대 수심 저장
+3. 벽으로 구분된 구역의 최대 수심 저장(maxDepths)
+4. 현재 수심은 물이 가득 찼다고 가정(depths)
 
 
-[2. 물 빠진 후 체크]
+[2. 물 빠진 후 높이]
 1. pq에 구멍 저장(깊이가 깊은 구멍부터 꺼내오기)_
-2. 꺼낸 구멍 기준 좌우 탐색
-- 현재 구멍 깊이보다 깊은 구멍 있을 경우, 현재 구멍 높이로 갱신
-- 방문처리
-- 만약 더 깊은곳이지만 방문헀던 칸이라면 방문 X(이미 다른 구멍에 의해 물이 빠진구역)
-- 더 얕은곳 만나면 종료
+2. 구멍의 수심을 현재 최대 수심(이하 d)으로 지정, 좌우로 탐색하기
+- 옆의 행의 현재 수심(depths[i]) > x 인 경우, 수심 갱신
+- 이 때, 옆의 행의 최대 수심(maxDepths[i]) < x인 경우, x를 maxDepths[i]로 갱신해줌
+- 반복하여 수심 구하기
+
+[3. 빈공간 체크]
+- 각 행의 최대깊이 - 현재깊이 = 해당 행에 남은 물의 수
   */
 public class Main {
-	static int N, K; //꼭짓점 수, 구멍 수 
-	static int answer;
-	static int[] depths; //각 칸의 수심
-	static boolean[] visited;
+	static int N, K, size; //꼭짓점 수, 구멍 수, 수족관 가로 길이
+	static int[] depths; //각 행의 현재 수심
+	static int[] maxDepths; //각 행의 최대수심
 	static int[] dir = {-1, 1}; //좌, 우로 이동
 	static int[][] edges; //꼭짓점 저장
 	static PriorityQueue<Integer> pq = new PriorityQueue<>((o1, o2) -> depths[o1] - depths[o2]);
@@ -34,8 +36,7 @@ public class Main {
 		N = Integer.parseInt(br.readLine());
 		edges = new int [N][2];
 		
-		int size = 0; //수족관의 가로 길이
-		int maxDepth = 0; //좌표 기준 최대 깊이
+		int maxDepth = 0; //수족관의 제일 깊은곳 깊이
 		for(int i = 0; i < N; i++) {
 			StringTokenizer st = new StringTokenizer(br.readLine());
 			int x = Integer.parseInt(st.nextToken());
@@ -45,8 +46,7 @@ public class Main {
 			if(i == N - 1) size = x;
 		}
 		depths = new int[size];
-		visited = new boolean[size]; //물 빠짐 처리가 된 행인지 확인
-		answer = size * maxDepth;
+		maxDepths = new int[size];
 		
 		K = Integer.parseInt(br.readLine());
 		for(int i = 0; i < K; i++) {
@@ -60,33 +60,14 @@ public class Main {
 			pq.offer(x); //y좌표는 pq에서 수심이 더 깊은 구멍을 먼저 가져오기 위해서만 사용됨. 추후 사용 x(depths배열이 있어 사용할 필요 없음)
 		}
 		
-		//1. 벽 구분 및 각 행의 수심 체크(수평선분만 보면 됨)
+		//1. 벽 구분 및 각 행의 수심 설정(수평선분만 보면 됨)
 		setDepth(maxDepth);
 		
 		//2. 각 행의 수심 확인
-		checkDepth(size);
+		checkDepth();
 		
-		//물 빠진 공간 넓이 체크
-		int width = 0;
-		int depth = -1;
-		int empty = 0;
-		for(int i = 0; i < size; i++) {
-			if(depth == -1) {
-				depth = depths[i];
-			}
-			else if(depth != depths[i]) { //높이가 다른 공간 만난경우, 물빠진 공간 계산
-				i--;
-				empty += width * (depth + 1);
-				depth = -1;
-				width = 0;
-				continue;
-			}
-			width++;
-		}
-		empty += width * (depth + 1);
-		
-		answer -= empty;
-		System.out.println(answer);
+		//3. 물 빠진 공간 넓이 체크
+		System.out.println(countWater());
 	}
 
 	static void setDepth(int maxDepth) {
@@ -95,39 +76,41 @@ public class Main {
 			int x2 = edges[i + 1][0];
 			int y = edges[i][1];
 			
-			for(int x = x1; x < x2; x++) depths[x] = y - 1; //수심 저장
-			answer -= (x2 - x1) * (maxDepth - y); //바닥 공간 제외
+			for(int x = x1; x < x2; x++) { //각 행의 수심 저장
+				depths[x] = -1; //현재 수심
+				maxDepths[x] = y - 1; //최대 수심
+			}
 		}
 	}
 	
-	static void checkDepth(int size) {
-		Queue<Integer> q = new ArrayDeque<>();
-		
+	static void checkDepth() {
 		while(!pq.isEmpty()) {
-			q.clear();
 			int start = pq.poll(); //구멍이 난 행 위치
-			if(visited[start]) continue; //이미 방문했다면, 탐색 필요 x(같은 수심에서 발생한 구멍이 이미 처리됨)
+			int depth = maxDepths[start];
+			depths[start] = depth; //현재 최대 깊이로 갱신(구멍난 구역이 최대 깊이, 물이 빠지는 깊이)
 			
-			int depth = depths[start];
-			visited[start] = true;
-			q.offer(start);
-			
-			while(!q.isEmpty()) {
-				int now = q.poll();
+			//구멍 기준 왼쪽 탐색
+			for(int next = start + 1; next < size; next++) {
+				if(depths[next] > depth) break; //이미 물이 빠진 구역을 만나면 종료
 				
-				//좌, 우로 이동
-				for(int d = 0; d < 2; d++) {
-					int next = now + dir[d];
-					
-					if(next < 0 || next >= size) continue; //OOB
-					if(visited[next]) continue; //이미 물이 빠진 구연
-					if(depths[next] < depth) continue; //수심이 더 낮음 == 벽임
-					
-					visited[next] = true;
-					depths[next] = depth;
-					q.offer(next);
-				}
+				if(maxDepths[next] < depth) depth = maxDepths[next]; //물이 다 빠져도 최대 깊이인 depth보다 작다면, 최대 깊이 갱신
+				depths[next] = depth;
+			}
+			
+			depth = maxDepths[start];
+			//구멍 기준 오른쪽 탐색
+			for(int next = start - 1; next >= 0; next--) {
+				if(depths[next] > depth) break; //이미 물이 빠진 구역을 만나면 종료
+				
+				if(maxDepths[next] < depth) depth = maxDepths[next]; //물이 다 빠져도 최대 깊이인 depth보다 작다면, 최대 깊이 갱신
+				depths[next] = depth;
 			}
 		}
+	}
+	
+	static int countWater() {
+		int cnt = 0;
+		for(int i = 0; i < size; i++) cnt += maxDepths[i] - depths[i];
+		return cnt;
 	}
 }
