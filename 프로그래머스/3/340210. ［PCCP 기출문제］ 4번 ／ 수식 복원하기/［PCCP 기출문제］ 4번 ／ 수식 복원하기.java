@@ -8,7 +8,7 @@ import java.util.*;
 
 2. 결과값이 있는 진법을 저장하는 Set<Integer> bases 생성
 
-3. 결과값이 있는 식들을 비교하며 어느 진법에서 결과값이 동일한지 확인
+3. 식들을 비교하며 어느 진법에서 결과값이 동일한지 확인
 - 현재 진법에서 나올 수 없는 수가 식에 있으면 bases.remove(현재 진수), continue
 - 현재 진법에서 연산한 결과와 결과값이 다르면 bases.remove(현재 진수), continue
 - 위 두 조건을 통과한다면 bases.add(현재 진수)
