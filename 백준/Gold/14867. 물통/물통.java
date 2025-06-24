@@ -2,8 +2,29 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
+	static class Pair{
+		int a;
+		int b;
+		
+		Pair(int a, int b){
+			this.a = a;
+			this.b = b;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			Pair o = (Pair) obj;
+			return this.a == o.a && this.b == o.b;
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(a, b);
+		}
+	}
+	
 	static int A, B, aEnd, bEnd;
-	static boolean[][] visited;
+	static Set<Pair> set = new HashSet<>();
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
@@ -15,12 +36,10 @@ public class Main {
 			System.out.println(0);
 			return;
 		}
-		visited = new boolean[A + 1][B + 1];
-		
 		Queue<int[]> q = new ArrayDeque<>();
 		
 		q.offer(new int[] {0, 0});
-		visited[0][0] = true;
+		set.add(new Pair(0, 0));
 		int cnt = 0;
 		boolean isEnd = false;
 		W:while(!q.isEmpty()) {
@@ -32,36 +51,40 @@ public class Main {
 				int b = now[1];
 				
 				//1. a 물통 물 버리기
-				if(!visited[0][b]) {
+				Pair p = new Pair(0, b);
+				if(!set.contains(p)) {
 					q.offer(new int[] {0, b});
-					visited[0][b] = true;
+					set.add(p);
 					if(aEnd == 0 && bEnd == b) {
 						isEnd = true;
 						break W;
 					}
 				}
 				//2. b 물통 물 버리기
-				if(!visited[a][0]) {
+				p = new Pair(a, 0);
+				if(!set.contains(p)) {
 					q.offer(new int[] {a, 0});
-					visited[a][0] = true;
+					set.add(p);
 					if(aEnd == a && bEnd == 0) {
 						isEnd = true;
 						break W;
 					}
 				}
 				//3. a 물통 물 채우기
-				if(!visited[A][b]) {
+				p = new Pair(A, b);
+				if(!set.contains(p)) {
 					q.offer(new int[] {A, b});
-					visited[A][b] = true;
+					set.add(p);
 					if(aEnd == A && bEnd == b) {
 						isEnd = true;
 						break W;
 					}
 				}
 				//4. b 물통 물 채우기
-				if(!visited[a][B]) {
+				p = new Pair(a, B);
+				if(!set.contains(p)) {
 					q.offer(new int[] {a, B});
-					visited[a][B] = true;
+					set.add(p);
 					if(aEnd == a && bEnd == B) {
 						isEnd = true;
 						break W;
@@ -74,9 +97,10 @@ public class Main {
 					na = nb - B;
 					nb = B;
 				}
-				if(!visited[na][nb]) {
+				p = new Pair(na, nb);
+				if(!set.contains(p)) {
 					q.offer(new int[] {na, nb});
-					visited[na][nb] = true;
+					set.add(p);
 					if(aEnd == na && bEnd == nb) {
 						isEnd = true;
 						break W;
@@ -89,10 +113,10 @@ public class Main {
 					nb = na - A;
 					na = A;
 				}
-				if(na > A) na = A;
-				if(!visited[na][nb]) {
+				p = new Pair(na, nb);
+				if(!set.contains(p)) {
 					q.offer(new int[] {na, nb});
-					visited[na][0] = true;
+					set.add(p);
 					if(aEnd == na && bEnd == nb) {
 						isEnd = true;
 						break W;
